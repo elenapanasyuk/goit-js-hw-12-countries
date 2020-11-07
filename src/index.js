@@ -16,11 +16,9 @@ refs.searchInput.addEventListener('input', debounce(onSearch, 500));
 
 function onSearch(e) {
   const searchQuery = e.target.value;
-  API.fetchCountries(searchQuery).then(isSearchSucces).catch(onFetchError);
-}
-
-function onFetchError(error) {
-  console.log('все пропало!');
+  API.fetchCountries(searchQuery)
+    .then(isSearchSucces)
+    .catch(foundNoMatchesAtAll);
 }
 
 function renderCountryCard(country) {
@@ -40,9 +38,9 @@ function foundTooManyMatches() {
   });
 }
 
-function foundNoMatches() {
+function foundNoMatchesAtAll() {
   error({
-    text: 'No matches found:(',
+    text: 'No matches found, try again!',
     delay: 2000,
   });
 }
@@ -54,7 +52,7 @@ function isSearchSucces(country) {
     renderCountriesList(country);
   } else if (country.length > 10) {
     foundTooManyMatches();
-  } else {
-    foundNoMatches();
+  } else if (response.status === 404) {
+    throw new Error();
   }
 }
